@@ -14,6 +14,6 @@ Spark 3.0.1 官网学习材料的阅读记录：[https://spark.apache.org/docs/3
 
 - API Docs
 
-- [Deploying](https://github.com/ZGG2016/spark-website/blob/master/Deploying/0%E7%9B%AE%E5%BD%95)
+- [Deploying](https://github.com/ZGG2016/spark-website/blob/master/Deploying/0%E7%9B%AE%E5%BD%95.md)
 
 - More
