@@ -2,13 +2,13 @@
 
 [TOC]
 
-<font>The spark-submit script in Spark’s bin directory is used to launch applications on a cluster. It can use all of Spark’s supported [cluster managers](https://spark.apache.org/docs/3.0.1/cluster-overview.html#cluster-manager-types) through a uniform interface so you don’t have to configure your application especially for each one.</font>
+> The spark-submit script in Spark’s bin directory is used to launch applications on a cluster. It can use all of Spark’s supported [cluster managers](https://spark.apache.org/docs/3.0.1/cluster-overview.html#cluster-manager-types) through a uniform interface so you don’t have to configure your application especially for each one.
 
 bin 目录下的 spark-submit 脚本用来启动应用程序。可以用在 Spark 所有支持的集群管理器，而不需要专门配置。
 
 ## 1、Bundling Your Application’s Dependencies
 
-<font>If your code depends on other projects, you will need to package them alongside your application in order to distribute the code to a Spark cluster. To do this, create an assembly jar (or “uber” jar) containing your code and its dependencies. Both sbt and Maven have assembly plugins. When creating assembly jars, list Spark and Hadoop as provided dependencies; these need not be bundled since they are provided by the cluster manager at runtime. Once you have an assembled jar you can call the bin/spark-submit script as shown here while passing your jar.</font>
+> If your code depends on other projects, you will need to package them alongside your application in order to distribute the code to a Spark cluster. To do this, create an assembly jar (or “uber” jar) containing your code and its dependencies. Both sbt and Maven have assembly plugins. When creating assembly jars, list Spark and Hadoop as provided dependencies; these need not be bundled since they are provided by the cluster manager at runtime. Once you have an assembled jar you can call the bin/spark-submit script as shown here while passing your jar.
 
 如果你的代码依赖其他的工程，你可以创建一个 jar (or “uber” jar)，来将你的代码和依赖一起打包。
 
@@ -16,13 +16,13 @@ bin 目录下的 spark-submit 脚本用来启动应用程序。可以用在 Spar
 
 在创建 jar 包时，列出 Spark 和 Hadoop 提供的依赖项。它们不需要被打包，因为在运行时它们已经被 集群管理器提供了。如果您已经有一个 jar ,您就可以调用 bin/spark-submit 脚本（如下所示）来传递您的 jar。（？？）
 
-<font>For Python, you can use the --py-files argument of spark-submit to add .py, .zip or .egg files to be distributed with your application. If you depend on multiple Python files we recommend packaging them into a .zip or .egg.</font>
+> For Python, you can use the --py-files argument of spark-submit to add .py, .zip or .egg files to be distributed with your application. If you depend on multiple Python files we recommend packaging them into a .zip or .egg.
 
 对于 Python ，使用 spark-submit 的 --py-files 参数来添加 .py，.zip 和 .egg 文件。如果依赖了多个 Python 文件我们推荐将它们打包成一个 .zip 或者 .egg 文件。
 
 ## 2、Launching Applications with spark-submit
 
-<font>Once a user application is bundled, it can be launched using the bin/spark-submit script. This script takes care of setting up the classpath with Spark and its dependencies, and can support different cluster managers and deploy modes that Spark supports:</font>
+> Once a user application is bundled, it can be launched using the bin/spark-submit script. This script takes care of setting up the classpath with Spark and its dependencies, and can support different cluster managers and deploy modes that Spark supports:
 
 打包完程序后，就可以使用 `bin/spark-submit` 来启动。 这个脚本设置 Spark 及其依赖的 classpath，支撑不同的集群管理器和部署模式。
 
@@ -35,7 +35,7 @@ bin 目录下的 spark-submit 脚本用来启动应用程序。可以用在 Spar
 	  <application-jar> \
 	  [application-arguments]
 
-<font>Some of the commonly used options are:</font>
+Some of the commonly used options are:
 
 - --class: The entry point for your application (e.g. org.apache.spark.examples.SparkPi)程序入口
 
@@ -49,21 +49,21 @@ bin 目录下的 spark-submit 脚本用来启动应用程序。可以用在 Spar
 
 - application-arguments: Arguments passed to the main method of your main class, if any 传给 main 方法的参数
 
-<font>† A common deployment strategy is to submit your application from a gateway machine that is physically co-located with your worker machines (e.g. Master node in a standalone EC2 cluster). In this setup, client mode is appropriate. In client mode, the driver is launched directly within the spark-submit process which acts as a client to the cluster. The input and output of the application is attached to the console. Thus, this mode is especially suitable for applications that involve the REPL (e.g. Spark shell).</font>
+> † A common deployment strategy is to submit your application from a gateway machine that is physically co-located with your worker machines (e.g. Master node in a standalone EC2 cluster). In this setup, client mode is appropriate. In client mode, the driver is launched directly within the spark-submit process which acts as a client to the cluster. The input and output of the application is attached to the console. Thus, this mode is especially suitable for applications that involve the REPL (e.g. Spark shell).
 
 一个常见的部署策略是从有个网关机器提交应用程序，这个网关机器是和你的 worker 机器位置在一起。（如：standalone EC2 集群下的 master 节点）。这种设置适合客户端模式。
 
 在客户端模式中，驱动直接运行在一个充当集群客户端的 spark-submit 进程内。应用程序的输入和输出直接连到控制台。因此，这个模式特别适合那些涉及 REPL（例如，Spark shell）的应用程序。
 
-<font>Alternatively, if your application is submitted from a machine far from the worker machines (e.g. locally on your laptop), it is common to use cluster mode to minimize network latency between the drivers and the executors. Currently, the standalone mode does not support cluster mode for Python applications.</font>
+> Alternatively, if your application is submitted from a machine far from the worker machines (e.g. locally on your laptop), it is common to use cluster mode to minimize network latency between the drivers and the executors. Currently, the standalone mode does not support cluster mode for Python applications.
 
 如果你的应用程序从远离 worker 机器的机器提交，（如你的本地笔记本），就适合用集群模式，来最小化驱动和 executors 的网络延迟。目前，Standalone 模式不支持集群模式的 Python 应用程序。
 
-<font>For Python applications, simply pass a .py file in the place of <application-jar> instead of a JAR, and add Python .zip, .egg or .py files to the search path with --py-files.</font>
+> For Python applications, simply pass a .py file in the place of <application-jar> instead of a JAR, and add Python .zip, .egg or .py files to the search path with --py-files.
 
 对于 Python 应用程序，给 application-jar 传递一个 .py 文件而不是一个 JAR，并且 --py-files 添加 Python .zip，.egg 或者 .py 文件。
 
-<font>There are a few options available that are specific to the [cluster manager](https://spark.apache.org/docs/3.0.1/cluster-overview.html#cluster-manager-types) that is being used. For example, with a [Spark standalone cluster](https://spark.apache.org/docs/3.0.1/spark-standalone.html) with cluster deploy mode, you can also specify --supervise to make sure that the driver is automatically restarted if it fails with a non-zero exit code. To enumerate all such options available to spark-submit, run it with --help. Here are a few examples of common options:</font>
+> There are a few options available that are specific to the [cluster manager](https://spark.apache.org/docs/3.0.1/cluster-overview.html#cluster-manager-types) that is being used. For example, with a [Spark standalone cluster](https://spark.apache.org/docs/3.0.1/spark-standalone.html) with cluster deploy mode, you can also specify --supervise to make sure that the driver is automatically restarted if it fails with a non-zero exit code. To enumerate all such options available to spark-submit, run it with --help. Here are a few examples of common options:
 
 这里有一些选项可用于特定的集群管理器中。例如，Spark standalone cluster 用集群部署模式，您也可以指定 --supervise 来确保驱动在 non-zero exit code 失败时可以自动重启。为了列出所有 spark-submit，可用的选项，用 --help. 来运行它。这里是一些常见选项的例子 :
 
@@ -153,47 +153,47 @@ k8s://HOST:PORT | Connect to a [Kubernetes](http://spark.apache.org/docs/latest/
 
 ## 4、Loading Configuration from a File
 
-<font>The spark-submit script can load default Spark configuration values from a properties file and pass them on to your application. By default, it will read options from conf/spark-defaults.conf in the Spark directory. For more detail, see the section on loading default configurations.</font>
+> The spark-submit script can load default Spark configuration values from a properties file and pass them on to your application. By default, it will read options from conf/spark-defaults.conf in the Spark directory. For more detail, see the section on loading default configurations.
 
 spark-submit 脚本默认从 `conf/spark-defaults.conf` 载入 Spark 配置值，再传给应用程序。
 
-<font>Loading default Spark configurations this way can obviate the need for certain flags to spark-submit. For instance, if the spark.master property is set, you can safely omit the --master flag from spark-submit. In general, configuration values explicitly set on a SparkConf take the highest precedence, then flags passed to spark-submit, then values in the defaults file.</font>
+> Loading default Spark configurations this way can obviate the need for certain flags to spark-submit. For instance, if the spark.master property is set, you can safely omit the --master flag from spark-submit. In general, configuration values explicitly set on a SparkConf take the highest precedence, then flags passed to spark-submit, then values in the defaults file.
 
 加载默认的 Spark 配置，这种方式可以消除某些 spark-submit 标记。例如，如果在设置了 spark.master 属性，那就可以在 spark-submit 中安全的省略 --master 配置。
 
 一般情况下，明确设置在 SparkConf 上的配置值的优先级最高，然后是传递给 spark-submit的值，最后才是 default value（默认文件）中的值。
 
-<font>If you are ever unclear where configuration options are coming from, you can print out fine-grained debugging information by running spark-submit with the --verbose option.</font>
+> If you are ever unclear where configuration options are coming from, you can print out fine-grained debugging information by running spark-submit with the --verbose option.
 
 通过使用 --verbose 选项来运行 spark-submit 打印出细粒度的调试信息。
 
 ## 5、Advanced Dependency Management
 
-<font>When using spark-submit, the application jar along with any jars included with the --jars option will be automatically transferred to the cluster. URLs supplied after --jars must be separated by commas. That list is included in the driver and executor classpaths. Directory expansion does not work with --jars.</font>
+> When using spark-submit, the application jar along with any jars included with the --jars option will be automatically transferred to the cluster. URLs supplied after --jars must be separated by commas. That list is included in the driver and executor classpaths. Directory expansion does not work with --jars.
 
 使用了 spark-submit ，应用程序及其 jar 自动传给集群。 `--jars` 后的 URLs 要用逗号分隔，这个列表会包含在驱动和 executor 的 classpaths，但它不支持目录。
 
-<font>Spark uses the following URL scheme to allow different strategies for disseminating jars:</font>
+> Spark uses the following URL scheme to allow different strategies for disseminating jars:
 
-<font>file: - Absolute paths and file:/ URIs are served by the driver’s HTTP file server, and every executor pulls the file from the driver HTTP server.</font>
+> file: - Absolute paths and file:/ URIs are served by the driver’s HTTP file server, and every executor pulls the file from the driver HTTP server.
 
 - file: 绝对路径和 file:/ URI 通过驱动的 HTTP file server 提供服务，并且每个 executor 会从 驱动的 HTTP server 拉取这些文件。
 
-<font>hdfs:, http:, https:, ftp: - these pull down files and JARs from the URI as expected</font>
+> hdfs:, http:, https:, ftp: - these pull down files and JARs from the URI as expected
 
 - hdfs:, http:, https:, ftp: 从指定的 URI 拉取文件和 JAR
 
-<font>local: - a URI starting with local:/ is expected to exist as a local file on each worker node. This means that no network IO will be incurred, and works well for large files/JARs that are pushed to each worker, or shared via NFS, GlusterFS, etc.</font>
+> local: - a URI starting with local:/ is expected to exist as a local file on each worker node. This means that no network IO will be incurred, and works well for large files/JARs that are pushed to each worker, or shared via NFS, GlusterFS, etc.
 
 - local： 一个用 local:/ 开头的 URL 需要在每个 worker 节点上作为一个本地文件存在。这样意味着没有网络 IO 发生，并且非常适用于那些已经被推送到每个 worker 或通过 NFS，GlusterFS 等共享的大型的 file/JAR。
 
-<font>Note that JARs and files are copied to the working directory for each SparkContext on the executor nodes. This can use up a significant amount of space over time and will need to be cleaned up. With YARN, cleanup is handled automatically, and with Spark standalone, automatic cleanup can be configured with the spark.worker.cleanup.appDataTtl property.</font>
+> Note that JARs and files are copied to the working directory for each SparkContext on the executor nodes. This can use up a significant amount of space over time and will need to be cleaned up. With YARN, cleanup is handled automatically, and with Spark standalone, automatic cleanup can be configured with the spark.worker.cleanup.appDataTtl property.
 
 注意：那些 JAR 和文件被复制到工作目录，用于 executor 节点上的每个 SparkContext 。随着时间的推移，这会用完大部分的空间，所以需要清理。在 Spark On YARN 模式中，自动执行清理操作。在 Spark standalone 模式中，可以通过配置 `spark.worker.cleanup.appDataTtl` 属性后会执行自动清理。
 
-<font>Users may also include any other dependencies by supplying a comma-delimited list of Maven coordinates with --packages. All transitive dependencies will be handled when using this command. Additional repositories (or resolvers in SBT) can be added in a comma-delimited fashion with the flag --repositories. (Note that credentials for password-protected repositories can be supplied in some cases in the repository URI, such as in https://user:password@host/.... Be careful when supplying credentials this way.) These commands can be used with pyspark, spark-shell, and spark-submit to include Spark Packages.
+> Users may also include any other dependencies by supplying a comma-delimited list of Maven coordinates with --packages. All transitive dependencies will be handled when using this command. Additional repositories (or resolvers in SBT) can be added in a comma-delimited fashion with the flag --repositories. (Note that credentials for password-protected repositories can be supplied in some cases in the repository URI, such as in https://user:password@host/.... Be careful when supplying credentials this way.) These commands can be used with pyspark, spark-shell, and spark-submit to include Spark Packages.
 
-For Python, the equivalent --py-files option can be used to distribute .egg, .zip and .py libraries to executors.</font>
+> For Python, the equivalent --py-files option can be used to distribute .egg, .zip and .py libraries to executors.
 
 用户也可以通过使用 `--packages` 选项来提供一个逗号分隔的列表，来包含任何其它的依赖。在使用这个命令时所有可传递的依赖将被处理。
 
@@ -206,4 +206,4 @@ For Python, the equivalent --py-files option can be used to distribute .egg, .zi
 
 ## 6、More Information
 
-<font>Once you have deployed your application, the [cluster mode overview](https://spark.apache.org/docs/3.0.1/cluster-overview.html) describes the components involved in distributed execution, and how to monitor and debug applications.</font>
+> Once you have deployed your application, the [cluster mode overview](https://spark.apache.org/docs/3.0.1/cluster-overview.html) describes the components involved in distributed execution, and how to monitor and debug applications.
