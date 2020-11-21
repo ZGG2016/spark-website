@@ -1,4 +1,4 @@
-# 官网：Spark Streaming Programming Guide
+# Spark Streaming Programming Guide
 
 [TOC]
 
