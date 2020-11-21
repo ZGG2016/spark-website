@@ -2,7 +2,7 @@
 
 [TOC]
 
-<font color="grey">In addition to running on the Mesos or YARN cluster managers, Spark also provides a simple standalone deploy mode. You can launch a standalone cluster either manually, by starting a master and workers by hand, or use our provided [launch scripts](https://spark.apache.org/docs/3.0.1/spark-standalone.html#cluster-launch-scripts). It is also possible to run these daemons on a single machine for testing.</font>
+> In addition to running on the Mesos or YARN cluster managers, Spark also provides a simple standalone deploy mode. You can launch a standalone cluster either manually, by starting a master and workers by hand, or use our provided [launch scripts](https://spark.apache.org/docs/3.0.1/spark-standalone.html#cluster-launch-scripts). It is also possible to run these daemons on a single machine for testing.
 
 Spark 不仅可以运行在 Mesos 和 YARN 集群管理器上，也提供了一个独立集群模式。
 
@@ -12,7 +12,7 @@ Spark 不仅可以运行在 Mesos 和 YARN 集群管理器上，也提供了一�
 
 ## 1、Security
 
-<font color="grey">Security in Spark is OFF by default. This could mean you are vulnerable to attack by default. Please see [Spark Security](https://spark.apache.org/docs/3.0.1/security.html) and the specific security sections in this doc before running Spark.</font>
+> Security in Spark is OFF by default. This could mean you are vulnerable to attack by default. Please see [Spark Security](https://spark.apache.org/docs/3.0.1/security.html) and the specific security sections in this doc before running Spark.
 
 **默认情况下，Spark 的安全模式是关闭的**，所以易受侵害，但可以通过设置来避免。
 
@@ -34,9 +34,9 @@ Spark 不仅可以运行在 Mesos 和 YARN 集群管理器上，也提供了一�
 ./sbin/start-master.sh
 ```
 
-<font color="grey">Once started, the master will print out a spark://HOST:PORT URL for itself, which you can use to connect workers to it, or pass as the “master” argument to SparkContext. You can also find this URL on the master’s web UI, which is http://localhost:8080 by default.
+> Once started, the master will print out a spark://HOST:PORT URL for itself, which you can use to connect workers to it, or pass as the “master” argument to SparkContext. You can also find this URL on the master’s web UI, which is http://localhost:8080 by default.
 
-Similarly, you can start one or more workers and connect them to the master via:</font>
+> Similarly, you can start one or more workers and connect them to the master via:
 
 启动后，master 打印出 `spark://HOST:PORT` ，可以使用它将 workers 连接到 master，或者作为 "master" 参数传给 SparkContext。
 
