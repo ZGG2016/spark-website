@@ -2,7 +2,7 @@
 
 [TOC]
 
-[Spark Streaming + Kafka Integration Guide](https://spark.apache.org/docs/2.4.4/streaming-kafka-integration.html)
+文档来源：[Spark Streaming + Kafka Integration Guide](https://spark.apache.org/docs/2.4.4/streaming-kafka-integration.html)
 
 > Apache Kafka is publish-subscribe messaging rethought as a distributed, partitioned, replicated commit log service. Please read the Kafka documentation thoroughly before starting an integration using Spark.
 

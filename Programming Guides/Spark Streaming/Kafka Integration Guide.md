@@ -25,9 +25,9 @@ Spark Streaming 集成 Kafka 0.10 提供了简单的并行性，kafka 分区和 
 
 > For Scala/Java applications using SBT/Maven project definitions, link your streaming application with the following artifact (see Linking section in the main programming guide for further information).
 
-  groupId = org.apache.spark
-  artifactId = spark-streaming-kafka-0-10_2.12
-  version = 3.0.1
+    groupId = org.apache.spark
+    artifactId = spark-streaming-kafka-0-10_2.12
+    version = 3.0.1
 
 > Do not manually add dependencies on org.apache.kafka artifacts (e.g. kafka-clients). The spark-streaming-kafka-0-10 artifact has the appropriate transitive dependencies already, and different versions may be incompatible in hard to diagnose ways.
 
