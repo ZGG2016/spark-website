@@ -39,11 +39,11 @@ Spark Streaming 2.4.4 兼容 Kafka 0.8 及更高。
 
 > This approach uses a Receiver to receive the data. The Receiver is implemented using the Kafka high-level consumer API. As with all receivers, the data received from Kafka through a Receiver is stored in Spark executors, and then jobs launched by Spark Streaming processes the data.
 
-Receiver 使用了 Kafka 高级消费者 API 实现的。**对于所有的 Receiver 从 Kafka 接收的数据都被存储在 Spark executors，Spark Streaming 启动的 jobs 来处理数据。**
+Receiver 使用了 Kafka high-level consumer API 实现的。**和所有的 receivers 一样，从 Kafka 通过一个 Receiver 接收的数据都被存储在 Spark executors，Spark Streaming 启动 jobs 来处理数据。**
 
 > However, under default configuration, this approach can lose data under failures (see [receiver reliability](http://spark.apache.org/docs/2.4.4/streaming-programming-guide.html#receiver-reliability). To ensure zero-data loss, you have to additionally enable Write-Ahead Logs in Spark Streaming (introduced in Spark 1.2). This synchronously saves all the received Kafka data into write-ahead logs on a distributed file system (e.g HDFS), so that all the data can be recovered on failure. See [Deploying section](http://spark.apache.org/docs/2.4.4/streaming-programming-guide.html#deploying-applications) in the streaming programming guide for more details on Write-Ahead Logs.
 
-然而，默认配置下，这个方法会**在故障时丢失数据。为避免这种情况，需要在 Spark Streaming 中启动 `Write-Ahead Logs`**。这会异步的将所有从 Kafka 接收到的数据存储到分布式文件系统的 `write-ahead logs` 中。【写入磁盘】
+然而，默认配置下，这个方法会**在故障时丢失数据。为确保零数据丢失，需要在 Spark Streaming 中启动 `Write-Ahead Logs`**。这会异步的将所有从 Kafka 接收到的数据存储到分布式文件系统(如HDFS)的 `write-ahead logs` 中。所以，所有的数据都可以从故障中恢复。
 
 Deploying section 描述了如何更多的细节。
 
@@ -75,6 +75,8 @@ import org.apache.spark.streaming.kafka._
 ```
 > You can also specify the key and value classes and their corresponding decoder classes using variations of createStream. See the [API docs](http://spark.apache.org/docs/2.4.4/api/scala/index.html#org.apache.spark.streaming.kafka.KafkaUtils$).
 
+也可以使用 `createStream` 的变体指定 key 和 value 类，以及它们对应的解码器类。
+
 **对于java**
 
 ```java
@@ -103,15 +105,15 @@ import org.apache.spark.streaming.kafka._
 
 > Topic partitions in Kafka do not correlate to partitions of RDDs generated in Spark Streaming. So increasing the number of topic-specific partitions in the KafkaUtils.createStream() only increases the number of threads using which topics that are consumed within a single receiver. It does not increase the parallelism of Spark in processing the data. Refer to the main document for more information on that.
 
-- Kafka 中的 topic 分区并不对应于 Spark Streaming 中的 RDD 分区。所以，在一个 receiver 中，在 `KafkaUtils.createStream() ` 中增加分区数只会增加消费这个 topic 的线程数。并不会增加 Spark 处理数据的并行度。
+- **Kafka 中的 topic 分区并不对应于 Spark Streaming 中的 RDD 分区**。所以，在一个 receiver 中，在 `KafkaUtils.createStream()` 中增加分区数只会增加消费这个 topic 的线程数，并不会增加 Spark 处理数据的并行度。
 
 > Multiple Kafka input DStreams can be created with different groups and topics for parallel receiving of data using multiple receivers.
 
-- 可以使用多个 receivers 来并行接收数据。
+- **可以使用多个 receivers 来并行接收数据**。
 
 > If you have enabled Write-Ahead Logs with a replicated file system like HDFS, the received data is already being replicated in the log. Hence, the storage level in storage level for the input stream to StorageLevel.MEMORY_AND_DISK_SER (that is, use KafkaUtils.createStream(..., StorageLevel.MEMORY_AND_DISK_SER)).
 
-- 如果已经启动的 `Write-Ahead Logs`，那么接收的数据已经被复制到了文件中。因此存储级别设置为 `StorageLevel.MEMORY_AND_DISK_SER`
+- **如果已经启动的 `Write-Ahead Logs`**，那么接收的数据已经被复制到了像 HDFS 这样的文件系统的文件中。因此**存储级别设置为 `StorageLevel.MEMORY_AND_DISK_SER`**。(`KafkaUtils.createStream(..., StorageLevel.MEMORY_AND_DISK_SER)`)
 
 > Deploying: As with any Spark applications, spark-submit is used to launch your application. However, the details are slightly different for Scala/Java applications and Python applications.
 
@@ -119,17 +121,17 @@ import org.apache.spark.streaming.kafka._
 
 > For Scala and Java applications, if you are using SBT or Maven for project management, then package spark-streaming-kafka-0-8_2.12 and its dependencies into the application JAR. Make sure spark-core_2.12 and spark-streaming_2.12 are marked as provided dependencies as those are already present in a Spark installation. Then use spark-submit to launch your application (see Deploying section in the main programming guide).
 
-对于 Scala and Java 应用程序，如果你使用了 SBT\Maven ，那么打包 `spark-streaming-kafka-0-8_2.12` 和它的依赖成 JAR。确保 `spark-core_2.12` 和 `spark-streaming_2.12` 标记为了 `provided`
+**对于 Scala and Java 应用程序**，如果你使用了 SBT\Maven ，那么**打包 `spark-streaming-kafka-0-8_2.12` 和它的依赖进 JAR**。确保 `spark-core_2.12` 和 `spark-streaming_2.12` 标记为了 `provided`。
 
 > For Python applications which lack SBT/Maven project management, spark-streaming-kafka-0-8_2.12 and its dependencies can be directly added to spark-submit using --packages (see Application Submission Guide). That is,
 
-对于 Pyhon，直接使用 `--packages` 添加到 `spark-submit`
+**对于 Pyhon，直接使用 `--packages` 添加到 `spark-submit`**
 
 ```sh
 ./bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.12:2.4.4 ...
 ```
 
-也可以，从 Maven 下载 jar 后，使用`--jars`添加。
+也可以，**从 Maven 下载 jar 后，使用 `--jars` 添加**。
 
 > Alternatively, you can also download the JAR of the Maven artifact spark-streaming-kafka-0-8-assembly from the Maven repository and add it to spark-submit with --jars.
 
@@ -139,9 +141,9 @@ import org.apache.spark.streaming.kafka._
 
 直连的方法会**周期地查询 Kafka 中每个 topic+partition 的最新偏移量，并据此，定义每个批次处理的偏移量范围。**
 
-处理数据的 job 启动时，Kafka 的简单消费者 API 被用来读取 Kafka 中定义的一定范围的偏移量（类似于从文件系统读取文件）。
+处理数据的 job 启动时，**Kafka 的 simple consumer API 被用来读取 Kafka 中定义的一定范围的偏移量（类似于从文件系统读取文件）**。
 
-注意：对于 Scala and Java API ，这个特性是在 Spark 1.3 引入的。对于 Python API ，是在 Spark 1.4 引入的。
+注意：对于 Scala 和 Java API ，这个特性是在 Spark 1.3 引入的。对于 Python API ，是在 Spark 1.4 引入的。
 
 > This approach has the following advantages over the receiver-based approach (i.e. Approach 1).
 
@@ -149,19 +151,19 @@ import org.apache.spark.streaming.kafka._
 
 > Simplified Parallelism: No need to create multiple input Kafka streams and union them. With directStream, Spark Streaming will create as many RDD partitions as there are Kafka partitions to consume, which will all read data from Kafka in parallel. So there is a one-to-one mapping between Kafka and RDD partitions, which is easier to understand and tune.
 
-- 简化了并行度：不再需要创建多个输入 Kafka 流，再合并。而使用 `directStream` ，Spark Streaming 将创建与 Kafka 分区一样多的 RDD 分区，这些分区将并行地从 Kafka 读取数据。所以，在 Kafka 分区和 RDD 分区间存在一对一的对应关系。
+- 简化了并行度：**不再需要创建多个输入 Kafka 流，再合并**。而使用 `directStream` ，Spark Streaming 将创建与 Kafka 分区一样多的 RDD 分区，这些分区将并行地从 Kafka 读取数据。所以，在 Kafka 分区和 RDD 分区间存在一对一的对应关系。
 
 > Efficiency: Achieving zero-data loss in the first approach required the data to be stored in a Write-Ahead Log, which further replicated the data. This is actually inefficient as the data effectively gets replicated twice - once by Kafka, and a second time by the Write-Ahead Log. This second approach eliminates the problem as there is no receiver, and hence no need for Write-Ahead Logs. As long as you have sufficient Kafka retention, messages can be recovered from Kafka.
 
-- 高效：在方法1中实现无数据丢失，需要将数据存储在 `Write-Ahead Log` 中，这样数据就冗余了。这样是和复制两次一样低效，一次是 Kafka 复制，一次是 Write-Ahead Log 。只要有足够的 Kafka retention，消息可以从 Kafka 中恢复。
+- 高效：在方法1中实现无数据丢失，需要将数据存储在 `Write-Ahead Log` 中，这样数据就冗余了。这样是和复制两次一样低效，一次是 Kafka 复制，一次是 Write-Ahead Log 。方法2消除了这个问题，**因为没有接收器，所以不需要 Write-Ahead Logs**。只要有足够的 Kafka retention【kafka中保留的数据】，消息可以从 Kafka 中恢复。
 
 > Exactly-once semantics: The first approach uses Kafka’s high-level API to store consumed offsets in Zookeeper. This is traditionally the way to consume data from Kafka. While this approach (in combination with-write-ahead logs) can ensure zero data loss (i.e. at-least once semantics), there is a small chance some records may get consumed twice under some failures. This occurs because of inconsistencies between data reliably received by Spark Streaming and offsets tracked by Zookeeper. Hence, in this second approach, we use simple Kafka API that does not use Zookeeper. Offsets are tracked by Spark Streaming within its checkpoints. This eliminates inconsistencies between Spark Streaming and Zookeeper/Kafka, and so each record is received by Spark Streaming effectively exactly once despite failures. In order to achieve exactly-once semantics for output of your results, your output operation that saves the data to an external data store must be either idempotent, or an atomic transaction that saves results and offsets (see [Semantics of output operations](http://spark.apache.org/docs/2.4.4/streaming-programming-guide.html#semantics-of-output-operations) in the main programming guide for further information).
 
-- Exactly-once 语义：方法1使用 Kafka 高级 API 在 Zookeeper 中存储消费的偏移量。这是传统的从 Kafka 消费数据的方法。当这个方法(启用了wal)确保无数据丢失时(如at-least once语义)，在某些故障下，记录就有可能被消费两次。这是因为 Spark Streaming 接收到的数据和 Zookeeper 追踪的偏移量不一致。所以，在方法2中，**使用简易 Kafka API，即不使用 Zookeeper。 Spark Streaming 使用 checkpoints 来追踪偏移量**。这就消除了 Spark Streaming 和 Zookeeper/Kafka 间的不一致性。所以 Spark Streaming 接收的数据即使在故障情况下也会只处理一次。为了实现输出结果的 exactly-once 语义，存储数据到外部存储介质的操作必须要么是幂等的，要么是存储结果和偏移量的原子的事务操作。
+- Exactly-once 语义：方法1使用 Kafka high-level API 在 Zookeeper 中存储消费的偏移量。这是传统的从 Kafka 消费数据的方法。当这个方法(启用了wal)确保无数据丢失时(如at-least once语义)，在某些故障下，记录就有可能被消费两次。这是因为 Spark Streaming 接收到的数据和 Zookeeper 追踪的偏移量不一致。所以，在方法2中，**使用 simple Kafka API，即不使用 Zookeeper。 Spark Streaming 使用 checkpoints 来追踪偏移量**。这就消除了 Spark Streaming 和 Zookeeper/Kafka 间的不一致性。所以 Spark Streaming 接收的数据即使在故障情况下也会只处理一次。为了实现输出结果的 exactly-once 语义，存储数据到外部存储介质的操作必须要么是幂等的，要么是存储结果和偏移量的原子事务操作。
 
 > Note that one disadvantage of this approach is that it does not update offsets in Zookeeper, hence Zookeeper-based Kafka monitoring tools will not show progress. However, you can access the offsets processed by this approach in each batch and update Zookeeper yourself (see below).
 
-注意：这个方法的缺点就是不会在 Zookeeper 中更新偏移量，因此基于 Zookeeper 的 Kafka 监控工具不会展示进度。但是，可以访问到每个批次中方法处理的偏移量，自己更新 Zookeeper。
+注意：这个方法的**缺点就是不会在 Zookeeper 中更新偏移量，因此基于 Zookeeper 的 Kafka 监控工具不会展示进度**。但是，可以访问到每个批次中方法处理的偏移量，自己更新 Zookeeper。
 
 *Next, we discuss how to use this approach in your streaming application.*
 
@@ -184,7 +186,7 @@ import org.apache.spark.streaming.kafka._
 ```
 > You can also pass a messageHandler to createDirectStream to access MessageAndMetadata that contains metadata about the current message and transform it to any desired type. See the [API docs](http://spark.apache.org/docs/2.4.4/api/scala/index.html#org.apache.spark.streaming.kafka.KafkaUtils$).
 
-可以添加参数 messageHandler 可以获取 MessageAndMetadata ，它包含了关于当前信息的元数据，转换它成任意类型。
+可以添加参数 `messageHandler` 来访问 `MessageAndMetadata` ，它包含了关于当前信息的元数据，以及转换它成任意类型。
 
 **对于java**
 
@@ -274,15 +276,15 @@ offsetRanges = []
 ```
 > You can use this to update Zookeeper yourself if you want Zookeeper-based Kafka monitoring tools to show progress of the streaming application.
 
-你可以使用这个来更新 Zookeeper。
+如果你像使用基于 Zookeeper 的 Kafka 监控工具来展示流应用程序的进度，可以使用这个来更新 Zookeeper。
 
 > Note that the typecast to HasOffsetRanges will only succeed if it is done in the first method called on the directKafkaStream, not later down a chain of methods. You can use transform() instead of foreachRDD() as your first method call in order to access offsets, then call further Spark methods. However, be aware that the one-to-one mapping between RDD partition and Kafka partition does not remain after any methods that shuffle or repartition, e.g. reduceByKey() or window().
 
-注意：只有在 directKafkaStream 的结果上调用第一个方法完成后，类型才能转换为 HasOffsetRanges ，而不是在后面的一系列方法之后。
+注意：只有在 `directKafkaStream` 的结果上调用第一个方法完成后，类型才能转换为 HasOffsetRanges ，而不是在后面的一系列方法之后。
 
-为了访问偏移量，可以使用 transform() 作为你的第一个方法，而不是 foreachRDD()。然后进一步调用 Spark 方法。
+为了访问偏移量，可以使用 `transform()` 作为你的第一个方法，而不是 `foreachRDD()`。然后进一步调用 Spark 方法。
 
-在执行 shuffle 或分区的方法(reduceByKey() or window())执行完后，RDD 分区和 Kafka 分区就不再一对一映射。
+在执行 shuffle 或分区的方法(reduceByKey()\window())执行完后，RDD 分区和 Kafka 分区就不再一对一映射。
 
 > Another thing to note is that since this approach does not use Receivers, the standard receiver-related (that is, configurations of the form spark.streaming.receiver.* ) will not apply to the input DStreams created by this approach (will apply to other input DStreams though). Instead, use the configurations `spark.streaming.kafka.*`.An important one is spark.streaming.kafka.maxRatePerPartition which is the maximum rate (in messages per second) at which each Kafka partition will be read by this direct API.
 

@@ -17,7 +17,7 @@ Spark Streaming 2.4.4 兼容 Kafka 0.8 及更高，支持直连和 Receiver 两�
 
 > The Spark Streaming integration for Kafka 0.10 provides simple parallelism, 1:1 correspondence between Kafka partitions and Spark partitions, and access to offsets and metadata. However, because the newer integration uses the [new Kafka consumer API](https://kafka.apache.org/documentation.html#newconsumerapi) instead of the simple API, there are notable differences in usage.
 
-Spark Streaming 集成 Kafka 0.10 提供了简单的并行性，kafka 分区和 spark 分区是一一对应的，以及对偏移量和元数据的访问。
+**Spark Streaming 对 Kafka 0.10 的集成提供了简单的并行性，kafka 分区和 spark 分区是一一对应的，以及对偏移量和元数据的访问**。
 
 但是，由于较新的集成使用了 new Kafka consumer API ，而不是 simple API，因此在使用上有明显的差异。
 
@@ -31,7 +31,7 @@ Spark Streaming 集成 Kafka 0.10 提供了简单的并行性，kafka 分区和 
 
 > Do not manually add dependencies on org.apache.kafka artifacts (e.g. kafka-clients). The spark-streaming-kafka-0-10 artifact has the appropriate transitive dependencies already, and different versions may be incompatible in hard to diagnose ways.
 
-不用手动在 `org.apache.kafka artifacts (e.g. kafka-clients)` 上添加依赖。
+不用手动地在 `org.apache.kafka artifacts (e.g. kafka-clients)` 上添加依赖。
 
 ### 1.2、Creating a Direct Stream
 
@@ -118,49 +118,51 @@ For possible kafkaParams, see [Kafka consumer config docs](http://kafka.apache.o
 
 > The new Kafka consumer API will pre-fetch messages into buffers. Therefore it is important for performance reasons that the Spark integration keep cached consumers on executors (rather than recreating them for each batch), and prefer to schedule partitions on the host locations that have the appropriate consumers.
 
-new Kafka consumer API 会先把消息拉取到缓存。因此，出于性能考虑，Spark 集成将缓存中的消费者放在 executors 上(而不是为每个 batch 重新创建它们)，而且**更倾向于在拥有合适消费者的主机位置调度分区**。
+new Kafka consumer API 会**先把消息拉取到缓存**。因此，出于性能考虑，Spark 集成**将缓存中的消费者放在 executors 上**(而不是为每个 batch 重新创建它们)，而且**更倾向于在拥有合适消费者的主机位置上调度分区**。
 
 > In most cases, you should use LocationStrategies.PreferConsistent as shown above. This will distribute partitions evenly across available executors. If your executors are on the same hosts as your Kafka brokers, use PreferBrokers, which will prefer to schedule partitions on the Kafka leader for that partition. Finally, if you have a significant skew in load among partitions, use PreferFixed. This allows you to specify an explicit mapping of partitions to hosts (any unspecified partitions will use a consistent location).
 
-在大多数情况下，使用 `LocationStrategies.PreferConsistent`。 这将平均分布分区到各个可用的 executors 上。
+在大多数情况下，使用 **`LocationStrategies.PreferConsistent`。 这将分区平均分发到各个可用的 executors 上**。
 
-如果 executors 和 Kafka brokers 在同一主机，使用 `PreferBrokers`，这就会在 Kafka leader 上调度分区。
+**如果 executors 和 Kafka brokers 在同一主机，使用 `PreferBrokers`，这会将那个分区调度到 Kafka leader 所在机器上**。
 
-如果分区之间的负载有很大的倾斜，那么使用 `PreferFixed` 。这将指定分区到主机的显式映射(任何未指定的分区都将使用一致的位置)。
+**如果分区之间的负载有很大的倾斜，那么使用 `PreferFixed` 。这将允许你指定一个分区到主机的显式映射(任何未指定的分区都将使用consistent location)**。
 
 > The cache for consumers has a default maximum size of 64. If you expect to be handling more than (64 * number of executors) Kafka partitions, you can change this setting via spark.streaming.kafka.consumer.cache.maxCapacity.
 
-存放 consumers 的缓存默认最大是64。如果要处理超多 `(64 * number of executors)` 的 kafka 分区，可用设置 `spark.streaming.kafka.consumer.cache.maxCapacity`
+**存放 consumers 的缓存默认最大是64。如果要处理超过 `(64 * number of executors)` 个 kafka 分区，需要设置 `spark.streaming.kafka.consumer.cache.maxCapacity`**。
 
 > If you would like to disable the caching for Kafka consumers, you can set spark.streaming.kafka.consumer.cache.enabled to false.
 
-如果不想缓存消息，可用设置 `spark.streaming.kafka.consumer.cache.enabled=false`
+**如果不想缓存消息，可用设置 `spark.streaming.kafka.consumer.cache.enabled=false`**
 
 > The cache is keyed by topicpartition and group.id, so use a separate group.id for each call to createDirectStream.
 
-每次调用的 createDirectStream ，使用一个独立的 `group.id`.
+**每个缓存的 key 是 topic分区和 group.id，所以每次调用的 `createDirectStream` ，使用一个独立的 `group.id`。**
 
 ### 1.4、ConsumerStrategies
 
 > The new Kafka consumer API has a number of different ways to specify topics, some of which require considerable post-object-instantiation setup. ConsumerStrategies provides an abstraction that allows Spark to obtain properly configured consumers even after restart from checkpoint.
 
-new Kafka consumer API 有多种方式指定 topic ，其中一些要求在实例化对象之后进行大量的配置，ConsumerStrategies 提供了一个抽象，允许 Spark 为 consumer 获取适合的配置，甚至在 checkpoint 重启之后也可以获取适合的配置。
+new Kafka consumer API 有多种方式指定 topic ，其中一些要求在实例化对象之后进行大量的配置。
+
+**ConsumerStrategies 提供了一个抽象，允许 Spark 获取适合的已配置的 consumers，甚至从 checkpoint 重启之后**。
 
 > ConsumerStrategies.Subscribe, as shown above, allows you to subscribe to a fixed collection of topics. SubscribePattern allows you to use a regex to specify topics of interest. Note that unlike the 0.8 integration, using Subscribe or SubscribePattern should respond to adding partitions during a running stream. Finally, Assign allows you to specify a fixed collection of partitions. All three strategies have overloaded constructors that allow you to specify the starting offset for a particular partition.
 
-`ConsumerStrategies.Subscribe` 允许你订阅一个固定的 topic 集合。
+**`ConsumerStrategies.Subscribe` 允许你订阅一个固定的 topics 集合。**
 
-`SubscribePattern` 可以使用正则表达式去指定所需要的 topic.
+**`SubscribePattern` 可以使用正则表达式去匹配所需要的 topics。**
 
-`Assign` 可以指定一个固定的分区集合。
+注意：不同于 0.8 集成，使用 `Subscribe` 或 `SubscribePattern` 应该在运行流时响应添加分区。
 
-这三种策略可以重载构造函数，允许你指定一个分区及其开始的偏移量。
+**`Assign` 可以指定一个固定的分区集合。**
 
-注意：不同于 0.8 集成，使用 `Subscribe` 或 `SubscribePattern` 会在运行流时响应添加分区。
+这三种策略可以重写构造函数，允许你在一个特定分区，指定其开始的偏移量。
 
 > If you have specific consumer setup needs that are not met by the options above, ConsumerStrategy is a public class that you can extend.
 
-可以通过继承 `ConsumerStrategy` 类，可以自定义策略。
+可以通过**继承 `ConsumerStrategy` 类，可以自定义策略**。
 
 ### 1.5、Creating an RDD
 
@@ -183,7 +185,7 @@ val rdd = KafkaUtils.createRDD[String, String](sparkContext, kafkaParams, offset
 ```
 > Note that you cannot use PreferBrokers, because without the stream there is not a driver-side consumer to automatically look up broker metadata for you. Use PreferFixed with your own metadata lookups if necessary.
 
-这种情况下不要使用 `PreferBrokers` 。因为没有 stream 的话就没有 driver 端的 consumer 检索元数据。必要时候，使用 PreferFixed 策略检索元数据。
+这种情况下不要使用 `PreferBrokers` 。因为如果没有 stream 的话，就没有 driver 端的 consumer 来自动检索元数据。必要时候，使用 `PreferFixed` 策略检索元数据。
 
 **对于java**
 
@@ -221,9 +223,9 @@ stream.foreachRDD { rdd =>
 > Note that the typecast to HasOffsetRanges will only succeed if it is done in the first method called on the result of createDirectStream, not later down a chain of methods. Be aware that the one-to-one mapping between RDD partition and Kafka partition does not remain after any methods that shuffle or repartition, e.g. reduceByKey() or window().
 
 
-注意：只有在 createDirectStream 的结果上调用第一个方法完成后，类型才能转换为 HasOffsetRanges ，而不是在后面的一系列方法之后。
+注意：只有在 `createDirectStream` 的结果上调用第一个方法完成后，类型才能转换为 HasOffsetRanges ，而不是在后面的一系列方法之后。
 
-在执行 shuffle 或分区的方法(reduceByKey() or window())执行完后，RDD 分区和 Kafka 分区就不再一对一映射。
+**在执行 shuffle 或重分区的方法(reduceByKey()\window())执行完后，RDD 分区和 Kafka 分区就不再一对一映射**。
 
 
 **对于java**
@@ -243,7 +245,9 @@ stream.foreachRDD(rdd -> {
 
 > Kafka delivery semantics in the case of failure depend on how and when offsets are stored. Spark output operations are [at-least-once](https://spark.apache.org/docs/3.0.1/streaming-programming-guide.html#semantics-of-output-operations). So if you want the equivalent of exactly-once semantics, you must either store offsets after an idempotent output, or store offsets in an atomic transaction alongside output. With this integration, you have 3 options, in order of increasing reliability (and code complexity), for how to store offsets.
 
-失败情况下，Kafka 交付语义依赖于偏移量的存储方式和时间。Spark 的输出操作是 at-least-once ，但如果想要 exactly-once 语义，那么必须在幂等输出之后存储偏移量，或者在与输出一起的原子事务中存储偏移量。
+失败情况下，Kafka 交付语义依赖于偏移量的存储方式和时间。
+
+**Spark 的输出操作是 at-least-once ，但如果想要 exactly-once 语义，那么必须在幂等输出之后存储偏移量，或者在与输出一起的原子事务中存储偏移量**。
 
 有三种方法：
 
@@ -251,28 +255,30 @@ stream.foreachRDD(rdd -> {
 
 > If you enable Spark [checkpointing](https://spark.apache.org/docs/3.0.1/streaming-programming-guide.html#checkpointing), offsets will be stored in the checkpoint. This is easy to enable, but there are drawbacks. Your output operation must be idempotent, since you will get repeated outputs; transactions are not an option. Furthermore, you cannot recover from a checkpoint if your application code has changed. For planned upgrades, you can mitigate this by running the new code at the same time as the old code (since outputs need to be idempotent anyway, they should not clash). But for unplanned failures that require code changes, you will lose data unless you have another way to identify known good starting offsets.
 
-如果启用了 Spark checkpointing，则偏移量在 checkpoint 中存储。这很容易启用，但也有缺点。
+如果**启用了 Spark checkpoint**，则偏移量在 checkpoint 中存储。这很容易启用，但也有缺点。
 
-输出操作必须是幂等的，因为你会得到重复的输出;
+输出操作必须是幂等的，因为你会得到重复的输出;【编程中一个幂等操作的特点是其任意多次执行所产生的影响均与一次执行的影响相同。】
 
 事务不是一个选项。
 
 如果应用程序代码已更改，则无法从 checkpoint 中恢复。
 
-对于计划中的升级，可以通过在运行旧代码的同时运行新代码来缓解这一问题(因为输出必须是幂等的，所以它们不应该冲突)。
-
-但是对于需要更改代码的计划外失败，除非有另一种方法来识别已知的良好起始偏移量，否则将丢失数据。
+对于计划中的升级，可以通过在运行旧代码的同时，运行新代码来缓解这一问题(因为输出必须是幂等的，所以它们不应该冲突)。但是对于需要更改代码的计划外失败，除非有另一种方法来识别已知的良好起始偏移量，否则将丢失数据。
 
 
 #### 1.7.2、Kafka itself
 
 > Kafka has an offset commit API that stores offsets in a special Kafka topic. By default, the new consumer will periodically auto-commit offsets. This is almost certainly not what you want, because messages successfully polled by the consumer may not yet have resulted in a Spark output operation, resulting in undefined semantics. This is why the stream example above sets “enable.auto.commit” to false. However, you can commit offsets to Kafka after you know your output has been stored, using the commitAsync API. The benefit as compared to checkpoints is that Kafka is a durable store regardless of changes to your application code. However, Kafka is not transactional, so your outputs must still be idempotent.
 
-Kafka 有一个偏移量提交 API，它在一个特殊的 Kafka topic 中存储偏移量。
+**Kafka 有一个偏移量提交 API，它在一个特殊的 Kafka topic 中存储偏移量**。
 
-默认情况下，新的 consumer 将定期自动提交偏移量。这几乎肯定不是您想要的结果，因为由 consumer 成功轮询的消息可能还没有导致 Spark 输出操作，从而导致语义未定义。这就是为什么上面的流示例将“enable.auto.commit”设置为false。
+默认情况下，新的 consumer 将定期自动提交偏移量。这几乎肯定不是你想要的结果，因为由 consumer 成功 poll 的消息可能还没有导致 Spark 输出操作，从而导致语义未定义。这就是为什么上面的流示例将 `enable.auto.commit` 设置为 false。
 
-但是，可以在知道输出已经被存储之后，使用 commitAsync API 向 Kafka 提交偏移量。与 checkpoints 相比，Kafka 的优点是无论应用程序代码如何更改，它都是一个持久存储。然而，Kafka 不是事务性的，所以你的输出必须仍然是幂等的。
+但是，**可以在知道输出已经被存储之后，使用 commitAsync API 向 Kafka 提交偏移量**。
+
+与 checkpoints 相比，Kafka 的优点是无论应用程序代码如何更改，它都是一个持久存储。
+
+然而，Kafka 不是事务性的，所以你的输出必须仍然是幂等的。
 
 **对于scala**
 
@@ -286,6 +292,10 @@ stream.foreachRDD { rdd =>
 ```
 
 > As with HasOffsetRanges, the cast to CanCommitOffsets will only succeed if called on the result of createDirectStream, not after transformations. The commitAsync call is threadsafe, but must occur after outputs if you want meaningful semantics.
+
+与 HasOffsetRanges 一样，只有在 `createDirectStream` 的结果上调用时，转换成 CanCommitOffsets 的操作才会成功，而不是在 transformations 之后。
+
+`commitAsync` 的调用是线程安全的，但是如果需要有意义的语义，则必须在输出之后发生。
 
 **对于java**
 
@@ -302,7 +312,7 @@ stream.foreachRDD(rdd -> {
 
 > For data stores that support transactions, saving offsets in the same transaction as the results can keep the two in sync, even in failure situations. If you’re careful about detecting repeated or skipped offset ranges, rolling back the transaction prevents duplicated or lost messages from affecting results. This gives the equivalent of exactly-once semantics. It is also possible to use this tactic even for outputs that result from aggregations, which are typically hard to make idempotent.
 
-对于支持事务的数据存储，在同一事务中保存偏移量作为结果，可以使两者保持同步，即使在失败的情况下也是如此。
+**对于支持事务的数据存储，在同一事务中保存偏移量作为结果，可以使两者保持同步，即使在失败的情况下也是如此**。
 
 如果小心地检测重复或跳过的偏移范围，回滚事务可以防止重复或丢失的消息影响结果。这就给出了等效的 exactly-once  语义。甚至对于聚合产生的输出也可以使用这种策略，而聚合通常很难使其幂等。
 
@@ -344,7 +354,7 @@ stream.foreachRDD { rdd =>
 
 // begin from the offsets committed to the database
 Map<TopicPartition, Long> fromOffsets = new HashMap<>();
-for (resultSet : selectOffsetsFromYourDatabase)
+for (resultSet : selectOffsetsFromYourDatabase){
   fromOffsets.put(new TopicPartition(resultSet.string("topic"), resultSet.int("partition")), resultSet.long("offset"));
 }
 
@@ -411,7 +421,7 @@ kafkaParams.put("ssl.key.password", "test1234");
 > For Scala and Java applications, if you are using SBT or Maven for project management, then package spark-streaming-kafka-0-10_2.12 and its dependencies into the application JAR. Make sure spark-core_2.12 and spark-streaming_2.12 are marked as provided dependencies as those are already present in a Spark installation. Then use spark-submit to launch your application (see [Deploying section](https://spark.apache.org/docs/3.0.1/streaming-programming-guide.html#deploying-applications) in the main programming guide).
 
 
-对 scala 和 java，添加 `spark-streaming-kafka-0-10_2.12` 依赖。且保证版本一致 `spark-core_2.12` 、 `spark-streaming_2.12`。然后使用 `spark-submit` 启动应用程序。
+对 scala 和 java 应用程序，打包 `spark-streaming-kafka-0-10_2.12` 和它的依赖进 JAR。且保证 `spark-core_2.12` 和 `spark-streaming_2.12`标记为 provided 依赖。然后使用 `spark-submit` 启动应用程序。
 
 ### 1.10、Security
 
