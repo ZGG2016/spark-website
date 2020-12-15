@@ -14,13 +14,13 @@
 
 spark-avro_2.12 和它的依赖可以直接使用 `--packages` 添加到 spark-submit
 
-	./bin/spark-submit --packages org.apache.spark:spark-avro_2.12:3.0.0 ...
+	./bin/spark-submit --packages org.apache.spark:spark-avro_2.12:3.0.1 ...
 
 > For experimenting on spark-shell, you can also use --packages to add org.apache.spark:spark-avro_2.12 and its dependencies directly,
 
 也可以使用 `--packages` ，将 `org.apache.spark:spark-avro_2.12` 它的依赖添加到 spark-shell
 
-	./bin/spark-shell --packages org.apache.spark:spark-avro_2.12:3.0.0 ...
+	./bin/spark-shell --packages org.apache.spark:spark-avro_2.12:3.0.1 ...
 
 > See [Application Submission Guide](https://spark.apache.org/docs/3.0.1/submitting-applications.html) for more details about submitting applications with external dependencies.
 
