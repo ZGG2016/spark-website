@@ -360,31 +360,12 @@ SparkSession available as 'spark'.
 
 ### 9.2、【方式2】spark-avro_2.12 和它的依赖可以直接使用 --packages 添加到 spark-submit
 
-从 [spark-avro_2.11/2.4.4](https://mvnrepository.com/artifact/org.apache.spark/spark-avro_2.11/2.4.4) 下载对应版本的 JAR 包，放到 Spark 的 `jars` 目录下。再执行如下命名:
-`spark-submit avro_read_sparksql.py  --master spark://zgg:7077 --jars /opt/spark-2.4.4-bin-hadoop2.7/jars/spark-avro_2.11-2.4.4.jar`
+从 [spark-avro_2.11/2.4.4](https://mvnrepository.com/artifact/org.apache.spark/spark-avro_2.11/2.4.4) 下载对应版本的 JAR 包，放到 Spark 的 `jars` 目录下。
 
-```sh
-[root@zgg python_script]# spark-submit avro_read_sparksql.py  --master spark://zgg:7077 --jars /opt/spark-2.4.4-bin-hadoop2.7/jars/spark-avro_2.11-2.4.4.jar
-20/10/30 10:51:10 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-20/10/30 10:51:10 INFO spark.SparkContext: Running Spark version 2.4.4
-20/10/30 10:51:10 INFO spark.SparkContext: Submitted application: datasource_avro
-...
-20/10/30 10:51:16 INFO executor.Executor: Running task 0.0 in stage 0.0 (TID 0)
-20/10/30 10:51:16 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
-20/10/30 10:51:16 INFO datasources.SQLHadoopMapReduceCommitProtocol: Using output committer class org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
-20/10/30 10:51:16 INFO datasources.FileScanRDD: Reading File path: file:///root/data/users.avro, range: 0-334, partition values: [empty row]
-20/10/30 10:51:16 INFO codegen.CodeGenerator: Code generated in 21.997514 ms
-20/10/30 10:51:16 INFO output.FileOutputCommitter: Saved output of task 'attempt_20201030105115_0000_m_000000_0' to file:/root/data/namesAndFavColors.avro/_temporary/0/task_20201030105115_0000_m_000000
-20/10/30 10:51:16 INFO mapred.SparkHadoopMapRedUtil: attempt_20201030105115_0000_m_000000_0: Committed
-20/10/30 10:51:16 INFO executor.Executor: Finished task 0.0 in stage 0.0 (TID 0). 2245 bytes result sent to driver
-20/10/30 10:51:16 INFO scheduler.TaskSetManager: Finished task 0.0 in stage 0.0 (TID 0) in 476 ms on localhost (executor driver) (1/1)
-20/10/30 10:51:16 INFO scheduler.TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool 
-20/10/30 10:51:16 INFO scheduler.DAGScheduler: ResultStage 0 (save at NativeMethodAccessorImpl.java:0) finished in 0.640 s
-20/10/30 10:51:16 INFO scheduler.DAGScheduler: Job 0 finished: save at NativeMethodAccessorImpl.java:0, took 0.728402 s
-20/10/30 10:51:16 INFO datasources.FileFormatWriter: Write Job fcbd7163-6076-4f72-8de4-720aac844654 committed.
-20/10/30 10:51:16 INFO datasources.FileFormatWriter: Finished processing stats for write job fcbd7163-6076-4f72-8de4-720aac844654.
-...
+再执行如下命令:
 
-```
+    spark-submit 
+    --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.4
+    --master spark://zgg:7077
+    avro_read_sparksql.py  
 
-执行 `spark-submit avro_read_sparksql.py  --master spark://zgg:7077 --packages org.apache.spark:spark-avro_2.11:2.4.4`，出现错误：`pyspark.sql.utils.AnalysisException: u'Failed to find data source: avro. Avro is built-in but external data source module since Spark 2.4. Please deploy the application as per the deployment section of "Apache Avro Data Source Guide".;'`【？？？】
