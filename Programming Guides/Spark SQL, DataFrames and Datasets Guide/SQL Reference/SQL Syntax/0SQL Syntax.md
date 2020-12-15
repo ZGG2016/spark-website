@@ -9,7 +9,7 @@
 
 - SELECT Statement
 
-	- [Hints]()
+	- [Hints](https://github.com/ZGG2016/spark-website/blob/master/Programming%20Guides/Spark%20SQL%2C%20DataFrames%20and%20Datasets%20Guide/SQL%20Reference/SQL%20Syntax/Hints.md)
 
 ## 3、Data Retrieval Statements
 
