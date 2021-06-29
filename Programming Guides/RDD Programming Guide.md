@@ -439,7 +439,7 @@ Spark 可以从 Hadoop 所支持的任何存储源中创建分布式数据集，
 
 > Some notes on reading files with Spark:
 
-distFile 一旦创建，便可以对其进行操作。例如，我们可以使用下面的 map 和 reduce 操作来统计行的数量：`distFile.map(lambda s: len(s)).reduce(lambda a, b: a + b).`
+distFile 一旦创建，便可以对其进行操作。例如，我们可以使用下面的 map 和 reduce 操作来统计所有行的大小：`distFile.map(lambda s: len(s)).reduce(lambda a, b: a + b).`
 
 使用 Spark 读文件 **需要注意以下几点**：
 
